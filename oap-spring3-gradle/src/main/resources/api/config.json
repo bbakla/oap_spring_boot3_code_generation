@@ -1,0 +1,20 @@
+{
+  "library": "spring-boot",
+  "dateLibrary": "java8",
+  "hideGenerationTimestamp": true,
+  "modelPackage": "com.example.petstore.api.model",
+  "apiPackage": "com.example.petstore.api",
+  "invokerPackage": "com.example.petstore.api",
+  "serializableModel": true,
+  "openApiNullable": false,
+  "useTags": true,
+  "useGzipFeature" : true,
+  "hateoas": true,
+  "unhandledException": true,
+  "useSpringBoot3": true,
+  "useSwaggerUI": true,
+  "importMappings": {
+    "ResourceSupport":"org.springframework.hateoas.RepresentationModel",
+    "Link": "org.springframework.hateoas.Link"
+  }
+}

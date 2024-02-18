@@ -1,0 +1,76 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id "io.freefair.lombok" version "8.4"
+    id 'org.hidetake.swagger.generator' version '2.19.2'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+processResources {
+    dependsOn(generateSwaggerCode)
+}
+
+
+swaggerSources {
+    petstore {
+        inputFile = file("${rootDir}/src/main/resources/api/petstore.yaml")
+        code {
+            language = 'spring'
+
+            configFile = file("${rootDir}/src/main/resources/api/config.json")
+            //what to generate. Optional.
+            components = [models: true, apis: true, supportingFiles: 'ApiUtil.java']
+            dependsOn validation //first validate the yaml
+        }
+    }
+}
+
+//Set generated code to sourceSet to be able to used it in the implementation
+compileJava.dependsOn swaggerSources.petstore.code
+sourceSets.main.java.srcDir "${swaggerSources.petstore.code.outputDir}/src/main/java"
+sourceSets.main.resources.srcDir "${swaggerSources.petstore.code.outputDir}/src/main/resources"
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compileOnly 'org.springframework.boot:spring-boot-starter-validation'
+    //we also set heteoas to true in config.json
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+
+    runtimeOnly 'com.h2database:h2'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //open api code generation
+    swaggerCodegen 'org.openapitools:openapi-generator-cli:7.3.0'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.20'
+
+    //open api ui
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
